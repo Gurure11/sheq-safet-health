@@ -315,7 +315,7 @@
       </div>
     </div>
 
-    <button type="button" class="nav-button active" data-section="dashboard">Dashboard</button>
+    <button type="button" class="nav-button" data-section="dashboard">Dashboard</button>
     <button type="button" class="nav-button" data-section="incidentSection">Incident Register</button>
     <button type="button" class="nav-button" data-section="ncrSection">NCR Register</button>
     <button type="button" class="nav-button" data-section="manhoursSection">Manhours Register</button>
@@ -323,7 +323,7 @@
     <button type="button" class="nav-button" data-section="trainingSection">Training</button>
     <button type="button" class="nav-button" data-section="monthlySection">Monthly Dashboard</button>
     <button type="button" class="nav-button" data-section="reportsSection">Reports</button>
-    <button type="button" class="nav-button" data-section="loginSection">Login</button>
+    <button type="button" class="nav-button active" data-section="loginSection">Login</button>
     <button type="button" class="nav-button" data-section="registerSection">New User Registration</button>
     <button type="button" class="nav-button" data-section="sheetTabsSection">Sheet Tabs</button>
   </aside>
@@ -334,7 +334,7 @@
         <button type="button" class="mobile-menu-btn" id="menuToggle">☰ Menu</button>
         <div>
           <h3 class="m-0 fw-bold">OnPoint Group SHEQ Dashboard</h3>
-          <small id="lastUpdated">Loading Google Sheet data...</small>
+          <small id="lastUpdated">Please login to continue. Login connects to SHEQ / Login tab.</small>
         </div>
       </div>
 
@@ -344,7 +344,7 @@
       </div>
     </div>
 
-    <section id="dashboard" class="section active">
+    <section id="dashboard" class="section">
       <div class="row g-3 mb-4">
         <div class="col-md-6 col-xl-3"><div class="kpi-card bg-blue"><h6>Total Incidents</h6><h2 id="totalIncidents">0</h2></div></div>
         <div class="col-md-6 col-xl-3"><div class="kpi-card bg-green"><h6>Total Manhours</h6><h2 id="totalManhours">0</h2></div></div>
@@ -546,7 +546,7 @@
       </div>
     </section>
 
-    <section id="loginSection" class="section">
+    <section id="loginSection" class="section active">
       <div class="panel login-box">
         <h5 class="panel-title">User Login</h5>
         <p class="hint">Login records are checked from Google Sheet tab: SHEQ / Login.</p>
@@ -634,7 +634,7 @@
   </main>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgFLxrOP-cYJiQSg0hmmKEp1NyZ1qLwAwGHasB3vjWLFgK44nD1PmHArmiWVg6dBiekg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYRyRFyQsT8QpaTNJ67WivyNTUBgHkd_jFAJDY2so39PpNFKdsVfmYH2x3SQXlpPVa7A/exec";
     let charts = {};
 
     const sidebar = document.getElementById("sidebar");
@@ -903,6 +903,9 @@
 
         if (result.status === "success") {
           notifyUser("Login successful. Welcome " + (result.user && result.user.fullName ? result.user.fullName : "user") + ".");
+          const dashboardButton = document.querySelector('[data-section="dashboard"]');
+          showSection("dashboard", dashboardButton);
+          await loadAllData();
         } else {
           notifyUser(result.message || "Login failed.");
         }
