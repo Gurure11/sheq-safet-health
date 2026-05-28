@@ -272,6 +272,75 @@
       flex-wrap: wrap;
     }
 
+
+    body.auth-mode {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(0,180,216,.25), transparent 32%),
+        linear-gradient(135deg, #07172b 0%, #0b1f3a 42%, #0077b6 100%);
+    }
+
+    body.auth-mode .sidebar,
+    body.auth-mode .topbar {
+      display: none !important;
+    }
+
+    body.auth-mode .main {
+      margin-left: 0;
+      width: 100%;
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.auth-mode .section {
+      display: none !important;
+    }
+
+    body.auth-mode #loginSection.active,
+    body.auth-mode #registerSection.active {
+      display: block !important;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    body.auth-mode .login-box {
+      max-width: 860px;
+      margin: 0 auto;
+      border: 0;
+      box-shadow: 0 24px 70px rgba(0,0,0,.22);
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .login-brand-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 12px 24px rgba(0,119,182,.22);
+    }
+
+    .auth-switch {
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    body.logged-in .sidebar {
+      display: block;
+    }
+
     @media (max-width: 992px) {
       .sidebar {
         transform: translateX(-100%);
@@ -303,7 +372,7 @@
   </style>
 </head>
 
-<body>
+<body class="auth-mode">
   <div class="overlay" id="overlay"></div>
 
   <aside class="sidebar" id="sidebar">
@@ -334,7 +403,7 @@
         <button type="button" class="mobile-menu-btn" id="menuToggle">☰ Menu</button>
         <div>
           <h3 class="m-0 fw-bold">OnPoint Group SHEQ Dashboard</h3>
-          <small id="lastUpdated">Please login to continue. Login connects to SHEQ / Login tab.</small>
+          <small id="lastUpdated">Please login to continue. Dashboard will unlock after successful authentication.</small>
         </div>
       </div>
 
@@ -548,8 +617,15 @@
 
     <section id="loginSection" class="section active">
       <div class="panel login-box">
+        <div class="login-brand">
+          <div class="login-brand-logo">OP</div>
+          <div>
+            <h4 class="m-0 fw-bold">OnPoint Group SHEQ</h4>
+            <div class="hint">Secure login connected to Google Sheet tab: Login</div>
+          </div>
+        </div>
         <h5 class="panel-title">User Login</h5>
-        <p class="hint">Login records are checked from Google Sheet tab: SHEQ / Login.</p>
+        <p class="hint">Enter the email and password saved in the Login tab of the SHEQ spreadsheet.</p>
 
         <form id="loginForm" class="row g-3">
           <div class="col-md-6">
@@ -568,6 +644,10 @@
         </form>
 
         <div id="loginMessage" class="mt-3 hint"></div>
+        <div class="auth-switch">
+          No account yet?
+          <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="showSection('registerSection', document.querySelector('[data-section=&quot;registerSection&quot;]'))">Register New User</button>
+        </div>
       </div>
     </section>
 
@@ -621,6 +701,10 @@
         </form>
 
         <div id="registerMessage" class="mt-3 hint"></div>
+        <div class="auth-switch">
+          Already registered?
+          <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="showSection('loginSection', document.querySelector('[data-section=&quot;loginSection&quot;]'))">Back to Login</button>
+        </div>
       </div>
     </section>
 
@@ -634,7 +718,7 @@
   </main>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYRyRFyQsT8QpaTNJ67WivyNTUBgHkd_jFAJDY2so39PpNFKdsVfmYH2x3SQXlpPVa7A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpVjZy69AHU3sG7k4sLfA90ZqFfA71AnCzB1APKo6LNptzEPHlaQTEHv_9iVVcLwrRow/exec";
     let charts = {};
 
     const sidebar = document.getElementById("sidebar");
@@ -652,7 +736,15 @@
       button.addEventListener("click", () => showSection(button.dataset.section, button));
     });
 
+    let isLoggedIn = false;
+
     function showSection(sectionId, button) {
+      if (!isLoggedIn && sectionId !== "loginSection" && sectionId !== "registerSection") {
+        sectionId = "loginSection";
+        button = document.querySelector('[data-section="loginSection"]');
+        notifyUser("Please login first.");
+      }
+
       document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
       const target = document.getElementById(sectionId);
       if (target) {
@@ -902,6 +994,9 @@
         document.getElementById("loginMessage").textContent = result.message || "";
 
         if (result.status === "success") {
+          isLoggedIn = true;
+          document.body.classList.remove("auth-mode");
+          document.body.classList.add("logged-in");
           notifyUser("Login successful. Welcome " + (result.user && result.user.fullName ? result.user.fullName : "user") + ".");
           const dashboardButton = document.querySelector('[data-section="dashboard"]');
           showSection("dashboard", dashboardButton);
@@ -984,7 +1079,10 @@
         .replaceAll("'", "&#039;");
     }
 
-    loadAllData();
+    // Dashboard data is loaded only after successful login.
+    document.addEventListener("DOMContentLoaded", () => {
+      setStatus("checking", "LOGIN REQUIRED");
+    });
   </script>
 </body>
 </html>
