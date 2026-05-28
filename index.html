@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnPoint Group SHEQ Dashboard</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background: #f4f6f9;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: #0B1F3A;
+      color: white;
+      position: fixed;
+      width: 250px;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      color: white;
+      display: block;
+      padding: 12px;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .sidebar a:hover {
+      background: #0077B6;
+    }
+
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+
+    .card {
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .kpi-card {
+      color: white;
+      padding: 25px;
+    }
+
+    .bg1 {
+      background: linear-gradient(135deg, #0077B6, #023E8A);
+    }
+
+    .bg2 {
+      background: linear-gradient(135deg, #2A9D8F, #1D7874);
+    }
+
+    .bg3 {
+      background: linear-gradient(135deg, #F4A261, #E76F51);
+    }
+
+    .bg4 {
+      background: linear-gradient(135deg, #D62828, #9D0208);
+    }
+
+    .status-live {
+      background: #2A9D8F;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 50px;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    table {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>OnPoint SHEQ</h2>
+
+  <a href="#">Dashboard</a>
+  <a href="#">Incident Register</a>
+  <a href="#">NCR Register</a>
+  <a href="#">Manhours Register</a>
+  <a href="#">Monthly Dashboard</a>
+  <a href="#">KPI Reports</a>
+</div>
+
+<div class="content">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>OnPoint Group SHEQ Dashboard</h2>
+    <div id="connectionStatus" class="status-live">Checking Connection...</div>
+  </div>
+
+  <div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+      <div class="card kpi-card bg1">
+        <h5>Total Incidents</h5>
+        <h2 id="totalIncidents">0</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card kpi-card bg2">
+        <h5>Total Manhours</h5>
+        <h2 id="totalManhours">0</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card kpi-card bg3">
+        <h5>Open NCRs</h5>
+        <h2 id="openNcrs">0</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card kpi-card bg4">
+        <h5>LTIFR</h5>
+        <h2 id="ltifr">0</h2>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row mb-4">
+
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h5>Incident Trends</h5>
+        <canvas id="incidentChart"></canvas>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-4">
+        <h5>Sheet Tabs</h5>
+        <ul id="sheetTabs" class="list-group"></ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card p-4">
+    <h5 class="mb-3">Latest Incidents</h5>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Project</th>
+          <th>Incident Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="incidentTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3kYc3aFAe6HQl5EHw_E--IBNOfjAnMcfRRZe42W98bkGs0PTpRkEZC1AobNbDrxo/exec";
+
+async function loadDashboard() {
+
+  try {
+
+    const response = await fetch(`${SCRIPT_URL}?action=dashboard`);
+    const data = await response.json();
+
+    document.getElementById("connectionStatus").innerHTML = "LIVE CONNECTED";
+    document.getElementById("connectionStatus").style.background = "#2A9D8F";
+
+    document.getElementById("totalIncidents").innerText = data.totalIncidents;
+    document.getElementById("totalManhours").innerText = data.totalManhours;
+    document.getElementById("openNcrs").innerText = data.openNcrs;
+    document.getElementById("ltifr").innerText = data.ltifr;
+
+    renderCharts(data);
+    renderTabs(data.sheetTabs);
+    renderIncidents(data.latestIncidents);
+
+  } catch(err) {
+
+    document.getElementById("connectionStatus").innerHTML = "NOT CONNECTED";
+    document.getElementById("connectionStatus").style.background = "#D62828";
+
+    console.error(err);
+  }
+}
+
+function renderTabs(tabs) {
+
+  const container = document.getElementById("sheetTabs");
+
+  container.innerHTML = "";
+
+  tabs.forEach(tab => {
+
+    container.innerHTML += `
+      <li class="list-group-item">
+        ${tab}
+      </li>
+    `;
+  });
+}
+
+function renderIncidents(data) {
+
+  const table = document.getElementById("incidentTable");
+
+  table.innerHTML = "";
+
+  data.forEach(row => {
+
+    table.innerHTML += `
+      <tr>
+        <td>${row.date}</td>
+        <td>${row.project}</td>
+        <td>${row.type}</td>
+        <td>${row.status}</td>
+      </tr>
+    `;
+  });
+}
+
+function renderCharts(data) {
+
+  new Chart(document.getElementById('incidentChart'), {
+    type: 'line',
+    data: {
+      labels: data.months,
+      datasets: [{
+        label: 'Incidents',
+        data: data.incidentTrend,
+        borderColor: '#0077B6',
+        tension: 0.4
+      }]
+    }
+  });
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
