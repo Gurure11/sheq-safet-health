@@ -1,267 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OnPoint Group SHEQ Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OnPoint Group SHEQ Reports</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    :root {
+      --navy: #0b1f3a;
+      --blue: #0077b6;
+      --cyan: #00b4d8;
+      --green: #2a9d8f;
+      --orange: #f4a261;
+      --red: #d62828;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #243447;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      background: #f4f6f9;
-      font-family: Arial, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
     }
 
     .sidebar {
-      height: 100vh;
-      background: #0B1F3A;
-      color: white;
+      width: 270px;
+      background: linear-gradient(180deg, var(--navy), #07172b);
+      color: #fff;
       position: fixed;
-      width: 250px;
-      padding: 20px;
+      inset: 0 auto 0 0;
+      z-index: 1040;
+      padding: 22px 18px;
+      transition: transform .25s ease;
+      overflow-y: auto;
     }
 
-    .sidebar h2 {
-      margin-bottom: 30px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
     }
 
-    .sidebar a {
-      color: white;
-      display: block;
-      padding: 12px;
-      text-decoration: none;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.05);
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
     }
 
-    .sidebar a:hover {
-      background: #0077B6;
+    .brand h1 {
+      font-size: 18px;
+      line-height: 1.2;
+      margin: 0;
     }
 
-    .content {
+    .brand small {
+      color: rgba(255,255,255,.72);
+    }
+
+    .nav-button {
+      border: 0;
+      width: 100%;
+      color: rgba(255,255,255,.9);
+      background: transparent;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      transition: .2s;
+      cursor: pointer;
+    }
+
+    .nav-button:hover,
+    .nav-button.active {
+      background: rgba(0,180,216,.18);
+      color: #fff;
+      transform: translateX(3px);
+    }
+
+    .main {
       margin-left: 270px;
-      padding: 20px;
+      width: calc(100% - 270px);
+      padding: 24px;
     }
 
-    .card {
-      border: none;
-      border-radius: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    .topbar {
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      box-shadow: 0 8px 26px rgba(11,31,58,.08);
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
     }
+
+    .mobile-menu-btn {
+      display: none;
+      border: 0;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      background: #6c757d;
+    }
+
+    .status-live { background: var(--green); }
+    .status-error { background: var(--red); }
+    .status-checking { background: var(--orange); }
+
+    .section { display: none; }
+    .section.active { display: block; }
 
     .kpi-card {
-      color: white;
-      padding: 25px;
+      color: #fff;
+      border: 0;
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 12px 28px rgba(11,31,58,.12);
+      min-height: 135px;
     }
 
-    .bg1 {
-      background: linear-gradient(135deg, #0077B6, #023E8A);
+    .kpi-card h6 {
+      opacity: .9;
+      margin-bottom: 12px;
+      font-weight: 700;
     }
 
-    .bg2 {
-      background: linear-gradient(135deg, #2A9D8F, #1D7874);
+    .kpi-card h2 {
+      font-weight: 800;
+      margin: 0;
     }
 
-    .bg3 {
-      background: linear-gradient(135deg, #F4A261, #E76F51);
+    .bg-blue { background: linear-gradient(135deg, #0077b6, #023e8a); }
+    .bg-green { background: linear-gradient(135deg, #2a9d8f, #1d7874); }
+    .bg-orange { background: linear-gradient(135deg, #f4a261, #e76f51); }
+    .bg-red { background: linear-gradient(135deg, #d62828, #9d0208); }
+
+    .panel {
+      background: var(--card);
+      border: 0;
+      border-radius: 22px;
+      box-shadow: 0 10px 28px rgba(11,31,58,.08);
+      padding: 22px;
+      margin-bottom: 22px;
     }
 
-    .bg4 {
-      background: linear-gradient(135deg, #D62828, #9D0208);
+    .panel-title {
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 16px;
     }
 
-    .status-live {
-      background: #2A9D8F;
-      color: white;
-      padding: 8px 15px;
-      border-radius: 50px;
-      display: inline-block;
-      font-weight: bold;
+    .table-responsive {
+      border-radius: 16px;
+      overflow: hidden;
     }
 
-    table {
-      font-size: 14px;
+    .table thead th {
+      background: var(--navy);
+      color: #fff;
+      border: 0;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .form-control, .form-select {
+      border-radius: 12px;
+      min-height: 44px;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 10px 18px;
+    }
+
+    .sheet-tab {
+      border-radius: 12px;
+      border: 1px solid #e6edf5;
+      padding: 10px 12px;
+      background: #f9fbfd;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 1030;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 14px;
+      }
+
+      .mobile-menu-btn {
+        display: inline-block;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
+  <div class="overlay" id="overlay"></div>
 
-<div class="sidebar">
-  <h2>OnPoint SHEQ</h2>
-
-  <a href="#">Dashboard</a>
-  <a href="#">Incident Register</a>
-  <a href="#">NCR Register</a>
-  <a href="#">Manhours Register</a>
-  <a href="#">Monthly Dashboard</a>
-  <a href="#">KPI Reports</a>
-</div>
-
-<div class="content">
-
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>OnPoint Group SHEQ Dashboard</h2>
-    <div id="connectionStatus" class="status-live">Checking Connection...</div>
-  </div>
-
-  <div class="row g-4 mb-4">
-
-    <div class="col-md-3">
-      <div class="card kpi-card bg1">
-        <h5>Total Incidents</h5>
-        <h2 id="totalIncidents">0</h2>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">OP</div>
+      <div>
+        <h1>OnPoint Group</h1>
+        <small>SHEQ Reports</small>
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card kpi-card bg2">
-        <h5>Total Manhours</h5>
-        <h2 id="totalManhours">0</h2>
+    <button class="nav-button active" data-section="dashboard">Dashboard</button>
+    <button class="nav-button" data-section="incidents">Incident Register</button>
+    <button class="nav-button" data-section="ncr">NCR Register</button>
+    <button class="nav-button" data-section="manhours">Manhours Register</button>
+    <button class="nav-button" data-section="monthly">Monthly Dashboard</button>
+    <button class="nav-button" data-section="sheets">Sheet Tabs</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="mobile-menu-btn" id="menuToggle">☰ Menu</button>
+        <div>
+          <h3 class="m-0 fw-bold">OnPoint Group SHEQ Dashboard</h3>
+          <small id="lastUpdated">Loading Google Sheet data...</small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-outline-primary" onclick="loadAllData()">Refresh</button>
+        <span id="connectionStatus" class="status-pill status-checking">CHECKING</span>
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card kpi-card bg3">
-        <h5>Open NCRs</h5>
-        <h2 id="openNcrs">0</h2>
+    <section id="dashboard" class="section active">
+      <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl-3">
+          <div class="kpi-card bg-blue">
+            <h6>Total Incidents</h6>
+            <h2 id="totalIncidents">0</h2>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="kpi-card bg-green">
+            <h6>Total Manhours</h6>
+            <h2 id="totalManhours">0</h2>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="kpi-card bg-orange">
+            <h6>Open NCRs</h6>
+            <h2 id="openNcrs">0</h2>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="kpi-card bg-red">
+            <h6>LTIFR</h6>
+            <h2 id="ltifr">0</h2>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="col-md-3">
-      <div class="card kpi-card bg4">
-        <h5>LTIFR</h5>
-        <h2 id="ltifr">0</h2>
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="panel">
+            <h5 class="panel-title">Incident Trend</h5>
+            <canvas id="incidentChart" height="115"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="panel">
+            <h5 class="panel-title">NCR Status</h5>
+            <canvas id="ncrChart" height="210"></canvas>
+          </div>
+        </div>
       </div>
-    </div>
 
-  </div>
-
-  <div class="row mb-4">
-
-    <div class="col-md-8">
-      <div class="card p-4">
-        <h5>Incident Trends</h5>
-        <canvas id="incidentChart"></canvas>
+      <div class="panel">
+        <h5 class="panel-title">Latest Incidents</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Project</th>
+                <th>Entity</th>
+                <th>Incident Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="latestIncidentsTable"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="col-md-4">
-      <div class="card p-4">
-        <h5>Sheet Tabs</h5>
-        <ul id="sheetTabs" class="list-group"></ul>
+    <section id="incidents" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Capture Incident</h5>
+        <form id="incidentForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Entity</label><input name="entity" class="form-control"></div>
+          <div class="col-md-3">
+            <label class="form-label">Incident Type</label>
+            <select name="incidentType" class="form-select">
+              <option>Near Miss</option>
+              <option>First Aid</option>
+              <option>Medical Treatment</option>
+              <option>LTI</option>
+              <option>Environmental</option>
+              <option>Property Damage</option>
+            </select>
+          </div>
+          <div class="col-md-3"><label class="form-label">Severity</label><input name="severity" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Responsible Person</label><input name="responsible" class="form-control"></div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select"><option>Open</option><option>Closed</option><option>In Progress</option></select>
+          </div>
+          <div class="col-md-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+          <div class="col-md-12"><label class="form-label">Corrective Action</label><textarea name="correctiveAction" class="form-control" rows="2"></textarea></div>
+          <div class="col-12"><button class="btn btn-primary">Submit Incident</button></div>
+        </form>
       </div>
-    </div>
 
-  </div>
+      <div class="panel">
+        <h5 class="panel-title">Incident Register</h5>
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead id="incidentHead"></thead>
+            <tbody id="incidentBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-  <div class="card p-4">
-    <h5 class="mb-3">Latest Incidents</h5>
+    <section id="ncr" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Capture NCR</h5>
+        <form id="ncrForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Department</label><input name="department" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Responsible</label><input name="responsible" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Target Date</label><input name="targetDate" type="date" class="form-control"></div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select"><option>Open</option><option>Closed</option><option>In Progress</option></select>
+          </div>
+          <div class="col-md-12"><label class="form-label">Finding</label><textarea name="finding" class="form-control" rows="3"></textarea></div>
+          <div class="col-md-12"><label class="form-label">Corrective Action</label><textarea name="correctiveAction" class="form-control" rows="2"></textarea></div>
+          <div class="col-12"><button class="btn btn-primary">Submit NCR</button></div>
+        </form>
+      </div>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Project</th>
-          <th>Incident Type</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+      <div class="panel">
+        <h5 class="panel-title">NCR Register</h5>
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead id="ncrHead"></thead>
+            <tbody id="ncrBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-      <tbody id="incidentTable"></tbody>
-    </table>
-  </div>
+    <section id="manhours" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Capture Manhours</h5>
+        <form id="manhoursForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Company</label><input name="company" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Employees</label><input name="employees" type="number" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Hours Worked</label><input name="hoursWorked" type="number" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Overtime</label><input name="overtime" type="number" class="form-control"></div>
+          <div class="col-12"><button class="btn btn-primary">Submit Manhours</button></div>
+        </form>
+      </div>
 
-</div>
+      <div class="panel">
+        <h5 class="panel-title">Manhours Register</h5>
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead id="manhoursHead"></thead>
+            <tbody id="manhoursBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-<script>
+    <section id="monthly" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Monthly Dashboard</h5>
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead id="monthlyHead"></thead>
+            <tbody id="monthlyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3kYc3aFAe6HQl5EHw_E--IBNOfjAnMcfRRZe42W98bkGs0PTpRkEZC1AobNbDrxo/exec";
+    <section id="sheets" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Connected Google Sheet Tabs</h5>
+        <div id="sheetTabsList"></div>
+      </div>
+    </section>
+  </main>
 
-async function loadDashboard() {
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7eAf0-1X7bCOGFQAjVk_Cm8ICFhY-j2Lj891BrxXm7RCtV-4CCKJD5Brz14kmvAVPGA/exec";
 
-  try {
+    let charts = {};
 
-    const response = await fetch(`${SCRIPT_URL}?action=dashboard`);
-    const data = await response.json();
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const menuToggle = document.getElementById("menuToggle");
 
-    document.getElementById("connectionStatus").innerHTML = "LIVE CONNECTED";
-    document.getElementById("connectionStatus").style.background = "#2A9D8F";
+    menuToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+      overlay.classList.toggle("show");
+    });
 
-    document.getElementById("totalIncidents").innerText = data.totalIncidents;
-    document.getElementById("totalManhours").innerText = data.totalManhours;
-    document.getElementById("openNcrs").innerText = data.openNcrs;
-    document.getElementById("ltifr").innerText = data.ltifr;
+    overlay.addEventListener("click", closeMobileMenu);
 
-    renderCharts(data);
-    renderTabs(data.sheetTabs);
-    renderIncidents(data.latestIncidents);
+    document.querySelectorAll(".nav-button").forEach(button => {
+      button.addEventListener("click", () => {
+        const section = button.dataset.section;
 
-  } catch(err) {
+        document.querySelectorAll(".nav-button").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
 
-    document.getElementById("connectionStatus").innerHTML = "NOT CONNECTED";
-    document.getElementById("connectionStatus").style.background = "#D62828";
+        document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+        document.getElementById(section).classList.add("active");
 
-    console.error(err);
-  }
-}
+        closeMobileMenu();
+      });
+    });
 
-function renderTabs(tabs) {
-
-  const container = document.getElementById("sheetTabs");
-
-  container.innerHTML = "";
-
-  tabs.forEach(tab => {
-
-    container.innerHTML += `
-      <li class="list-group-item">
-        ${tab}
-      </li>
-    `;
-  });
-}
-
-function renderIncidents(data) {
-
-  const table = document.getElementById("incidentTable");
-
-  table.innerHTML = "";
-
-  data.forEach(row => {
-
-    table.innerHTML += `
-      <tr>
-        <td>${row.date}</td>
-        <td>${row.project}</td>
-        <td>${row.type}</td>
-        <td>${row.status}</td>
-      </tr>
-    `;
-  });
-}
-
-function renderCharts(data) {
-
-  new Chart(document.getElementById('incidentChart'), {
-    type: 'line',
-    data: {
-      labels: data.months,
-      datasets: [{
-        label: 'Incidents',
-        data: data.incidentTrend,
-        borderColor: '#0077B6',
-        tension: 0.4
-      }]
+    function closeMobileMenu() {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("show");
     }
-  });
-}
 
-loadDashboard();
+    function setStatus(type, text) {
+      const status = document.getElementById("connectionStatus");
+      status.className = "status-pill";
+      if (type === "live") status.classList.add("status-live");
+      if (type === "error") status.classList.add("status-error");
+      if (type === "checking") status.classList.add("status-checking");
+      status.textContent = text;
+    }
 
-</script>
+    async function loadAllData() {
+      setStatus("checking", "CHECKING");
 
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=dashboard`);
+        const data = await res.json();
+
+        if (!data.connected) throw new Error(data.message || "Not connected");
+
+        setStatus("live", "LIVE CONNECTED");
+        document.getElementById("lastUpdated").textContent = `Connected to Google Sheet • Last updated ${new Date().toLocaleString()}`;
+
+        fillDashboard(data);
+        renderTable("incidentHead", "incidentBody", data.incidentRegister);
+        renderTable("ncrHead", "ncrBody", data.ncrRegister);
+        renderTable("manhoursHead", "manhoursBody", data.manhoursRegister);
+        renderTable("monthlyHead", "monthlyBody", data.monthlyDashboard);
+        renderSheetTabs(data.sheetTabs || []);
+      } catch (error) {
+        console.error(error);
+        setStatus("error", "NOT CONNECTED");
+        document.getElementById("lastUpdated").textContent = "Could not connect. Check your Apps Script URL and deployment access.";
+      }
+    }
+
+    function fillDashboard(data) {
+      document.getElementById("totalIncidents").textContent = data.totalIncidents || 0;
+      document.getElementById("totalManhours").textContent = Number(data.totalManhours || 0).toLocaleString();
+      document.getElementById("openNcrs").textContent = data.openNcrs || 0;
+      document.getElementById("ltifr").textContent = data.ltifr || 0;
+
+      renderLatestIncidents(data.latestIncidents || []);
+      renderCharts(data);
+    }
+
+    function renderLatestIncidents(rows) {
+      const body = document.getElementById("latestIncidentsTable");
+      body.innerHTML = "";
+
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No incidents found.</td></tr>`;
+        return;
+      }
+
+      rows.forEach(row => {
+        body.innerHTML += `
+          <tr>
+            <td>${safe(row.date)}</td>
+            <td>${safe(row.project)}</td>
+            <td>${safe(row.entity)}</td>
+            <td>${safe(row.incidentType)}</td>
+            <td>${safe(row.status)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderSheetTabs(tabs) {
+      const box = document.getElementById("sheetTabsList");
+      box.innerHTML = "";
+
+      if (!tabs.length) {
+        box.innerHTML = `<p class="text-muted">No sheet tabs found.</p>`;
+        return;
+      }
+
+      tabs.forEach(tab => {
+        box.innerHTML += `<div class="sheet-tab">${safe(tab)}</div>`;
+      });
+    }
+
+    function renderTable(headId, bodyId, tableData) {
+      const head = document.getElementById(headId);
+      const body = document.getElementById(bodyId);
+
+      head.innerHTML = "";
+      body.innerHTML = "";
+
+      if (!tableData || !tableData.headers || tableData.headers.length === 0) {
+        head.innerHTML = `<tr><th>No headings found</th></tr>`;
+        body.innerHTML = `<tr><td class="text-muted">No data available.</td></tr>`;
+        return;
+      }
+
+      head.innerHTML = `<tr>${tableData.headers.map(h => `<th>${safe(h)}</th>`).join("")}</tr>`;
+
+      if (!tableData.rows || tableData.rows.length === 0) {
+        body.innerHTML = `<tr><td colspan="${tableData.headers.length}" class="text-center text-muted">No rows found.</td></tr>`;
+        return;
+      }
+
+      tableData.rows.forEach(row => {
+        body.innerHTML += `<tr>${row.map(cell => `<td>${safe(cell)}</td>`).join("")}</tr>`;
+      });
+    }
+
+    function renderCharts(data) {
+      const months = data.months || [];
+      const trend = data.incidentTrend || [];
+      const open = Number(data.openNcrs || 0);
+      const closed = Number(data.closedNcrs || 0);
+
+      if (charts.incident) charts.incident.destroy();
+      if (charts.ncr) charts.ncr.destroy();
+
+      charts.incident = new Chart(document.getElementById("incidentChart"), {
+        type: "line",
+        data: {
+          labels: months,
+          datasets: [{
+            label: "Incidents",
+            data: trend,
+            borderColor: "#0077B6",
+            backgroundColor: "rgba(0,119,182,.12)",
+            tension: .4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      charts.ncr = new Chart(document.getElementById("ncrChart"), {
+        type: "doughnut",
+        data: {
+          labels: ["Open", "Closed"],
+          datasets: [{
+            data: [open, closed],
+            backgroundColor: ["#D62828", "#2A9D8F"]
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+
+    async function postData(payload) {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      return res.json();
+    }
+
+    function formToObject(form) {
+      const data = {};
+      new FormData(form).forEach((value, key) => data[key] = value);
+      return data;
+    }
+
+    document.getElementById("incidentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = formToObject(e.target);
+      payload.action = "addIncident";
+      await postData(payload);
+      e.target.reset();
+      await loadAllData();
+      alert("Incident submitted successfully.");
+    });
+
+    document.getElementById("ncrForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = formToObject(e.target);
+      payload.action = "addNCR";
+      await postData(payload);
+      e.target.reset();
+      await loadAllData();
+      alert("NCR submitted successfully.");
+    });
+
+    document.getElementById("manhoursForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = formToObject(e.target);
+      payload.action = "addManhours";
+      payload.totalHours = (Number(payload.hoursWorked) || 0) + (Number(payload.overtime) || 0);
+      await postData(payload);
+      e.target.reset();
+      await loadAllData();
+      alert("Manhours submitted successfully.");
+    });
+
+    function safe(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    loadAllData();
+  </script>
 </body>
 </html>
