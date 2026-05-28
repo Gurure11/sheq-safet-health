@@ -11,14 +11,18 @@
   <style>
     :root {
       --navy: #0b1f3a;
+      --navy2: #07172b;
       --blue: #0077b6;
       --cyan: #00b4d8;
       --green: #2a9d8f;
       --orange: #f4a261;
       --red: #d62828;
+      --purple: #6f42c1;
       --bg: #f4f6f9;
       --card: #ffffff;
       --text: #243447;
+      --muted: #6c757d;
+      --border: #e7edf5;
     }
 
     * { box-sizing: border-box; }
@@ -30,45 +34,44 @@
       color: var(--text);
     }
 
-    .app-shell {
-      display: flex;
-      min-height: 100vh;
-    }
-
     .sidebar {
-      width: 270px;
-      background: linear-gradient(180deg, var(--navy), #07172b);
+      width: 280px;
+      background: linear-gradient(180deg, var(--navy), var(--navy2));
       color: #fff;
       position: fixed;
-      inset: 0 auto 0 0;
+      top: 0;
+      bottom: 0;
+      left: 0;
       z-index: 1040;
       padding: 22px 18px;
-      transition: transform .25s ease;
       overflow-y: auto;
+      transition: transform .25s ease;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     .brand-mark {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
       background: linear-gradient(135deg, var(--cyan), var(--blue));
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 18px;
+      box-shadow: 0 10px 24px rgba(0, 180, 216, .22);
     }
 
     .brand h1 {
       font-size: 18px;
-      line-height: 1.2;
+      line-height: 1.1;
       margin: 0;
+      font-weight: 800;
     }
 
     .brand small {
@@ -82,30 +85,30 @@
       background: transparent;
       text-align: left;
       padding: 12px 14px;
-      border-radius: 12px;
+      border-radius: 13px;
       margin-bottom: 8px;
-      font-weight: 600;
+      font-weight: 700;
       transition: .2s;
       cursor: pointer;
     }
 
     .nav-button:hover,
     .nav-button.active {
-      background: rgba(0,180,216,.18);
+      background: rgba(0,180,216,.2);
       color: #fff;
       transform: translateX(3px);
     }
 
     .main {
-      margin-left: 270px;
-      width: calc(100% - 270px);
+      margin-left: 280px;
+      width: calc(100% - 280px);
       padding: 24px;
     }
 
     .topbar {
-      background: rgba(255,255,255,.9);
+      background: rgba(255,255,255,.95);
       backdrop-filter: blur(8px);
-      border-radius: 20px;
+      border-radius: 22px;
       box-shadow: 0 8px 26px rgba(11,31,58,.08);
       padding: 18px 20px;
       margin-bottom: 22px;
@@ -122,14 +125,14 @@
       color: #fff;
       border-radius: 12px;
       padding: 10px 12px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .status-pill {
       border-radius: 999px;
       padding: 8px 14px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       color: #fff;
       white-space: nowrap;
       background: #6c757d;
@@ -139,13 +142,22 @@
     .status-error { background: var(--red); }
     .status-checking { background: var(--orange); }
 
-    .section { display: none; }
+    .section {
+      display: none;
+      animation: fadeIn .18s ease-in-out;
+    }
+
     .section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: .2; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .kpi-card {
       color: #fff;
       border: 0;
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 22px;
       box-shadow: 0 12px 28px rgba(11,31,58,.12);
       min-height: 135px;
@@ -154,11 +166,11 @@
     .kpi-card h6 {
       opacity: .9;
       margin-bottom: 12px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .kpi-card h2 {
-      font-weight: 800;
+      font-weight: 900;
       margin: 0;
     }
 
@@ -166,25 +178,28 @@
     .bg-green { background: linear-gradient(135deg, #2a9d8f, #1d7874); }
     .bg-orange { background: linear-gradient(135deg, #f4a261, #e76f51); }
     .bg-red { background: linear-gradient(135deg, #d62828, #9d0208); }
+    .bg-purple { background: linear-gradient(135deg, #6f42c1, #3c096c); }
+    .bg-darkblue { background: linear-gradient(135deg, #0b1f3a, #0077b6); }
 
     .panel {
       background: var(--card);
-      border: 0;
-      border-radius: 22px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
       box-shadow: 0 10px 28px rgba(11,31,58,.08);
       padding: 22px;
       margin-bottom: 22px;
     }
 
     .panel-title {
-      font-weight: 800;
+      font-weight: 900;
       color: var(--navy);
       margin-bottom: 16px;
     }
 
     .table-responsive {
       border-radius: 16px;
-      overflow: hidden;
+      overflow: auto;
+      max-height: 520px;
     }
 
     .table thead th {
@@ -193,28 +208,40 @@
       border: 0;
       font-size: 13px;
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     .form-control, .form-select {
-      border-radius: 12px;
+      border-radius: 13px;
       min-height: 44px;
+      border-color: #dce5ee;
     }
 
     .btn-primary {
       background: var(--blue);
       border-color: var(--blue);
-      border-radius: 12px;
-      font-weight: 700;
+      border-radius: 13px;
+      font-weight: 800;
       padding: 10px 18px;
     }
 
+    .btn-outline-primary {
+      border-radius: 13px;
+      font-weight: 800;
+    }
+
     .sheet-tab {
-      border-radius: 12px;
-      border: 1px solid #e6edf5;
-      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
       background: #f9fbfd;
       margin-bottom: 8px;
-      font-weight: 700;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .overlay {
@@ -223,6 +250,11 @@
       inset: 0;
       background: rgba(0,0,0,.45);
       z-index: 1030;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
     }
 
     @media (max-width: 992px) {
@@ -268,56 +300,40 @@
       </div>
     </div>
 
-    <button class="nav-button active" data-section="dashboard">Dashboard</button>
-    <button class="nav-button" data-section="incidents">Incident Register</button>
-    <button class="nav-button" data-section="ncr">NCR Register</button>
-    <button class="nav-button" data-section="manhours">Manhours Register</button>
-    <button class="nav-button" data-section="monthly">Monthly Dashboard</button>
-    <button class="nav-button" data-section="sheets">Sheet Tabs</button>
+    <button type="button" class="nav-button active" data-section="dashboard">Dashboard</button>
+    <button type="button" class="nav-button" data-section="incidentSection">Incident Register</button>
+    <button type="button" class="nav-button" data-section="ncrSection">NCR Register</button>
+    <button type="button" class="nav-button" data-section="manhoursSection">Manhours Register</button>
+    <button type="button" class="nav-button" data-section="inspectionSection">Inspections</button>
+    <button type="button" class="nav-button" data-section="trainingSection">Training</button>
+    <button type="button" class="nav-button" data-section="monthlySection">Monthly Dashboard</button>
+    <button type="button" class="nav-button" data-section="sheetTabsSection">Sheet Tabs</button>
   </aside>
 
   <main class="main">
     <div class="topbar">
       <div class="d-flex align-items-center gap-3">
-        <button class="mobile-menu-btn" id="menuToggle">☰ Menu</button>
+        <button type="button" class="mobile-menu-btn" id="menuToggle">☰ Menu</button>
         <div>
           <h3 class="m-0 fw-bold">OnPoint Group SHEQ Dashboard</h3>
           <small id="lastUpdated">Loading Google Sheet data...</small>
         </div>
       </div>
 
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-outline-primary" onclick="loadAllData()">Refresh</button>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAllData()">Refresh</button>
         <span id="connectionStatus" class="status-pill status-checking">CHECKING</span>
       </div>
     </div>
 
     <section id="dashboard" class="section active">
       <div class="row g-3 mb-4">
-        <div class="col-md-6 col-xl-3">
-          <div class="kpi-card bg-blue">
-            <h6>Total Incidents</h6>
-            <h2 id="totalIncidents">0</h2>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="kpi-card bg-green">
-            <h6>Total Manhours</h6>
-            <h2 id="totalManhours">0</h2>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="kpi-card bg-orange">
-            <h6>Open NCRs</h6>
-            <h2 id="openNcrs">0</h2>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="kpi-card bg-red">
-            <h6>LTIFR</h6>
-            <h2 id="ltifr">0</h2>
-          </div>
-        </div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-blue"><h6>Total Incidents</h6><h2 id="totalIncidents">0</h2></div></div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-green"><h6>Total Manhours</h6><h2 id="totalManhours">0</h2></div></div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-orange"><h6>Open NCRs</h6><h2 id="openNcrs">0</h2></div></div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-red"><h6>LTIFR</h6><h2 id="ltifr">0</h2></div></div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-purple"><h6>Inspections</h6><h2 id="totalInspections">0</h2></div></div>
+        <div class="col-md-6 col-xl-3"><div class="kpi-card bg-darkblue"><h6>Training Records</h6><h2 id="totalTraining">0</h2></div></div>
       </div>
 
       <div class="row g-4">
@@ -339,93 +355,53 @@
         <h5 class="panel-title">Latest Incidents</h5>
         <div class="table-responsive">
           <table class="table table-striped table-hover mb-0">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Project</th>
-                <th>Entity</th>
-                <th>Incident Type</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Date</th><th>Project</th><th>Entity</th><th>Incident Type</th><th>Status</th></tr></thead>
             <tbody id="latestIncidentsTable"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <section id="incidents" class="section">
+    <section id="incidentSection" class="section">
       <div class="panel">
         <h5 class="panel-title">Capture Incident</h5>
         <form id="incidentForm" class="row g-3">
           <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
-          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
-          <div class="col-md-3"><label class="form-label">Entity</label><input name="entity" class="form-control"></div>
-          <div class="col-md-3">
-            <label class="form-label">Incident Type</label>
-            <select name="incidentType" class="form-select">
-              <option>Near Miss</option>
-              <option>First Aid</option>
-              <option>Medical Treatment</option>
-              <option>LTI</option>
-              <option>Environmental</option>
-              <option>Property Damage</option>
-            </select>
-          </div>
-          <div class="col-md-3"><label class="form-label">Severity</label><input name="severity" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Project / Site</label><input name="project" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Entity / Company</label><input name="entity" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Location</label><input name="location" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Incident Type</label><select name="incidentType" class="form-select"><option>Near Miss</option><option>First Aid</option><option>Medical Treatment</option><option>LTI</option><option>Environmental</option><option>Property Damage</option><option>Security</option></select></div>
+          <div class="col-md-3"><label class="form-label">Severity</label><select name="severity" class="form-select"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
           <div class="col-md-3"><label class="form-label">Responsible Person</label><input name="responsible" class="form-control"></div>
-          <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-select"><option>Open</option><option>Closed</option><option>In Progress</option></select>
-          </div>
+          <div class="col-md-3"><label class="form-label">Status</label><select name="status" class="form-select"><option>Open</option><option>In Progress</option><option>Closed</option></select></div>
           <div class="col-md-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
           <div class="col-md-12"><label class="form-label">Corrective Action</label><textarea name="correctiveAction" class="form-control" rows="2"></textarea></div>
           <div class="col-12"><button class="btn btn-primary">Submit Incident</button></div>
         </form>
       </div>
-
-      <div class="panel">
-        <h5 class="panel-title">Incident Register</h5>
-        <div class="table-responsive">
-          <table class="table table-striped mb-0">
-            <thead id="incidentHead"></thead>
-            <tbody id="incidentBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="panel"><h5 class="panel-title">Incident Register Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="incidentHead"></thead><tbody id="incidentBody"></tbody></table></div></div>
     </section>
 
-    <section id="ncr" class="section">
+    <section id="ncrSection" class="section">
       <div class="panel">
         <h5 class="panel-title">Capture NCR</h5>
         <form id="ncrForm" class="row g-3">
           <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
           <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
           <div class="col-md-3"><label class="form-label">Department</label><input name="department" class="form-control"></div>
-          <div class="col-md-3"><label class="form-label">Responsible</label><input name="responsible" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">NCR Type</label><select name="ncrType" class="form-select"><option>Safety</option><option>Health</option><option>Environmental</option><option>Quality</option></select></div>
+          <div class="col-md-3"><label class="form-label">Responsible Person</label><input name="responsible" class="form-control"></div>
           <div class="col-md-3"><label class="form-label">Target Date</label><input name="targetDate" type="date" class="form-control"></div>
-          <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-select"><option>Open</option><option>Closed</option><option>In Progress</option></select>
-          </div>
+          <div class="col-md-3"><label class="form-label">Status</label><select name="status" class="form-select"><option>Open</option><option>In Progress</option><option>Closed</option></select></div>
           <div class="col-md-12"><label class="form-label">Finding</label><textarea name="finding" class="form-control" rows="3"></textarea></div>
           <div class="col-md-12"><label class="form-label">Corrective Action</label><textarea name="correctiveAction" class="form-control" rows="2"></textarea></div>
           <div class="col-12"><button class="btn btn-primary">Submit NCR</button></div>
         </form>
       </div>
-
-      <div class="panel">
-        <h5 class="panel-title">NCR Register</h5>
-        <div class="table-responsive">
-          <table class="table table-striped mb-0">
-            <thead id="ncrHead"></thead>
-            <tbody id="ncrBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="panel"><h5 class="panel-title">NCR Register Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="ncrHead"></thead><tbody id="ncrBody"></tbody></table></div></div>
     </section>
 
-    <section id="manhours" class="section">
+    <section id="manhoursSection" class="section">
       <div class="panel">
         <h5 class="panel-title">Capture Manhours</h5>
         <form id="manhoursForm" class="row g-3">
@@ -438,41 +414,71 @@
           <div class="col-12"><button class="btn btn-primary">Submit Manhours</button></div>
         </form>
       </div>
-
-      <div class="panel">
-        <h5 class="panel-title">Manhours Register</h5>
-        <div class="table-responsive">
-          <table class="table table-striped mb-0">
-            <thead id="manhoursHead"></thead>
-            <tbody id="manhoursBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="panel"><h5 class="panel-title">Manhours Register Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="manhoursHead"></thead><tbody id="manhoursBody"></tbody></table></div></div>
     </section>
 
-    <section id="monthly" class="section">
+    <section id="inspectionSection" class="section">
       <div class="panel">
-        <h5 class="panel-title">Monthly Dashboard</h5>
-        <div class="table-responsive">
-          <table class="table table-striped mb-0">
-            <thead id="monthlyHead"></thead>
-            <tbody id="monthlyBody"></tbody>
-          </table>
-        </div>
+        <h5 class="panel-title">Capture Inspection</h5>
+        <form id="inspectionForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Inspection Type</label><select name="inspectionType" class="form-select"><option>Site Inspection</option><option>Vehicle Inspection</option><option>Equipment Inspection</option><option>PPE Inspection</option><option>Environmental Inspection</option></select></div>
+          <div class="col-md-3"><label class="form-label">Inspector</label><input name="inspector" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Score %</label><input name="score" type="number" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Status</label><select name="status" class="form-select"><option>Compliant</option><option>Non-Compliant</option><option>Action Required</option></select></div>
+          <div class="col-md-12"><label class="form-label">Findings / Comments</label><textarea name="comments" class="form-control" rows="3"></textarea></div>
+          <div class="col-12"><button class="btn btn-primary">Submit Inspection</button></div>
+        </form>
       </div>
+      <div class="panel"><h5 class="panel-title">Inspection Register Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="inspectionHead"></thead><tbody id="inspectionBody"></tbody></table></div></div>
     </section>
 
-    <section id="sheets" class="section">
+    <section id="trainingSection" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Capture Training</h5>
+        <form id="trainingForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input name="date" type="date" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Employee Name</label><input name="employeeName" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Training Topic</label><input name="trainingTopic" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Trainer</label><input name="trainer" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Expiry Date</label><input name="expiryDate" type="date" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Status</label><select name="status" class="form-select"><option>Completed</option><option>Expired</option><option>Pending</option></select></div>
+          <div class="col-12"><button class="btn btn-primary">Submit Training</button></div>
+        </form>
+      </div>
+      <div class="panel"><h5 class="panel-title">Training Register Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="trainingHead"></thead><tbody id="trainingBody"></tbody></table></div></div>
+    </section>
+
+    <section id="monthlySection" class="section">
+      <div class="panel">
+        <h5 class="panel-title">Capture Monthly Dashboard Entry</h5>
+        <form id="monthlyForm" class="row g-3">
+          <div class="col-md-3"><label class="form-label">Month</label><input name="month" type="month" class="form-control" required></div>
+          <div class="col-md-3"><label class="form-label">Project</label><input name="project" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Incidents</label><input name="incidents" type="number" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Open NCRs</label><input name="openNcrs" type="number" class="form-control"></div>
+          <div class="col-md-2"><label class="form-label">Closed NCRs</label><input name="closedNcrs" type="number" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">Manhours</label><input name="manhours" type="number" class="form-control"></div>
+          <div class="col-md-3"><label class="form-label">LTIFR</label><input name="ltifr" type="number" step="0.01" class="form-control"></div>
+          <div class="col-12"><button class="btn btn-primary">Submit Monthly Entry</button></div>
+        </form>
+      </div>
+      <div class="panel"><h5 class="panel-title">Monthly Dashboard Data</h5><div class="table-responsive"><table class="table table-striped mb-0"><thead id="monthlyHead"></thead><tbody id="monthlyBody"></tbody></table></div></div>
+    </section>
+
+    <section id="sheetTabsSection" class="section">
       <div class="panel">
         <h5 class="panel-title">Connected Google Sheet Tabs</h5>
+        <p class="hint">The Apps Script will create these tabs automatically inside the Google Sheet named SHEQ if they do not exist.</p>
         <div id="sheetTabsList"></div>
       </div>
     </section>
   </main>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7eAf0-1X7bCOGFQAjVk_Cm8ICFhY-j2Lj891BrxXm7RCtV-4CCKJD5Brz14kmvAVPGA/exec";
-
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWxqtBpILK8tYIkRsKYR3zlbE_EHEZqPRNWWxIeSxR4Y-SMPzUfhsKFZloGWHdR9uSnA/exec";
     let charts = {};
 
     const sidebar = document.getElementById("sidebar");
@@ -487,18 +493,22 @@
     overlay.addEventListener("click", closeMobileMenu);
 
     document.querySelectorAll(".nav-button").forEach(button => {
-      button.addEventListener("click", () => {
-        const section = button.dataset.section;
-
-        document.querySelectorAll(".nav-button").forEach(b => b.classList.remove("active"));
-        button.classList.add("active");
-
-        document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-        document.getElementById(section).classList.add("active");
-
-        closeMobileMenu();
-      });
+      button.addEventListener("click", () => showSection(button.dataset.section, button));
     });
+
+    function showSection(sectionId, button) {
+      document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      document.querySelectorAll(".nav-button").forEach(btn => btn.classList.remove("active"));
+      if (button) button.classList.add("active");
+
+      closeMobileMenu();
+    }
 
     function closeMobileMenu() {
       sidebar.classList.remove("open");
@@ -524,12 +534,14 @@
         if (!data.connected) throw new Error(data.message || "Not connected");
 
         setStatus("live", "LIVE CONNECTED");
-        document.getElementById("lastUpdated").textContent = `Connected to Google Sheet • Last updated ${new Date().toLocaleString()}`;
+        document.getElementById("lastUpdated").textContent = `Connected to SHEQ Google Sheet • Last updated ${new Date().toLocaleString()}`;
 
         fillDashboard(data);
         renderTable("incidentHead", "incidentBody", data.incidentRegister);
         renderTable("ncrHead", "ncrBody", data.ncrRegister);
         renderTable("manhoursHead", "manhoursBody", data.manhoursRegister);
+        renderTable("inspectionHead", "inspectionBody", data.inspectionRegister);
+        renderTable("trainingHead", "trainingBody", data.trainingRegister);
         renderTable("monthlyHead", "monthlyBody", data.monthlyDashboard);
         renderSheetTabs(data.sheetTabs || []);
       } catch (error) {
@@ -544,6 +556,8 @@
       document.getElementById("totalManhours").textContent = Number(data.totalManhours || 0).toLocaleString();
       document.getElementById("openNcrs").textContent = data.openNcrs || 0;
       document.getElementById("ltifr").textContent = data.ltifr || 0;
+      document.getElementById("totalInspections").textContent = data.totalInspections || 0;
+      document.getElementById("totalTraining").textContent = data.totalTraining || 0;
 
       renderLatestIncidents(data.latestIncidents || []);
       renderCharts(data);
@@ -581,7 +595,7 @@
       }
 
       tabs.forEach(tab => {
-        box.innerHTML += `<div class="sheet-tab">${safe(tab)}</div>`;
+        box.innerHTML += `<div class="sheet-tab"><span>${safe(tab.name || tab)}</span><span>${safe(tab.rows || 0)} rows</span></div>`;
       });
     }
 
@@ -632,24 +646,16 @@
             fill: true
           }]
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
-        }
+        options: { responsive: true, plugins: { legend: { display: false } } }
       });
 
       charts.ncr = new Chart(document.getElementById("ncrChart"), {
         type: "doughnut",
         data: {
           labels: ["Open", "Closed"],
-          datasets: [{
-            data: [open, closed],
-            backgroundColor: ["#D62828", "#2A9D8F"]
-          }]
+          datasets: [{ data: [open, closed], backgroundColor: ["#D62828", "#2A9D8F"] }]
         },
-        options: {
-          responsive: true
-        }
+        options: { responsive: true }
       });
     }
 
@@ -658,7 +664,6 @@
         method: "POST",
         body: JSON.stringify(payload)
       });
-
       return res.json();
     }
 
@@ -668,36 +673,34 @@
       return data;
     }
 
-    document.getElementById("incidentForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const payload = formToObject(e.target);
-      payload.action = "addIncident";
-      await postData(payload);
-      e.target.reset();
-      await loadAllData();
-      alert("Incident submitted successfully.");
-    });
+    function bindForm(formId, action, message) {
+      document.getElementById(formId).addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = formToObject(e.target);
+        payload.action = action;
 
-    document.getElementById("ncrForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const payload = formToObject(e.target);
-      payload.action = "addNCR";
-      await postData(payload);
-      e.target.reset();
-      await loadAllData();
-      alert("NCR submitted successfully.");
-    });
+        if (action === "addManhours") {
+          payload.totalHours = (Number(payload.hoursWorked) || 0) + (Number(payload.overtime) || 0);
+        }
 
-    document.getElementById("manhoursForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const payload = formToObject(e.target);
-      payload.action = "addManhours";
-      payload.totalHours = (Number(payload.hoursWorked) || 0) + (Number(payload.overtime) || 0);
-      await postData(payload);
-      e.target.reset();
-      await loadAllData();
-      alert("Manhours submitted successfully.");
-    });
+        const result = await postData(payload);
+        if (result.status !== "success") {
+          alert(result.message || "Could not save record.");
+          return;
+        }
+
+        e.target.reset();
+        await loadAllData();
+        alert(message);
+      });
+    }
+
+    bindForm("incidentForm", "addIncident", "Incident submitted successfully.");
+    bindForm("ncrForm", "addNCR", "NCR submitted successfully.");
+    bindForm("manhoursForm", "addManhours", "Manhours submitted successfully.");
+    bindForm("inspectionForm", "addInspection", "Inspection submitted successfully.");
+    bindForm("trainingForm", "addTraining", "Training submitted successfully.");
+    bindForm("monthlyForm", "addMonthly", "Monthly entry submitted successfully.");
 
     function safe(value) {
       if (value === null || value === undefined) return "";
