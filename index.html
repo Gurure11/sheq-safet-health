@@ -972,24 +972,25 @@
         } finally {
           setButtonSync(submitButton, false);
         }
-        function logoutUser() {
-  isLoggedIn = false;
-
-  document.body.classList.remove("logged-in");
-  document.body.classList.add("auth-mode");
-
-  document.getElementById("loginForm").reset();
-
-  setStatus("checking", "LOGIN REQUIRED");
-  document.getElementById("lastUpdated").textContent =
-    "Please login to continue. Dashboard will unlock after successful authentication.";
-
-  const loginButton = document.querySelector('[data-section="loginSection"]');
-  showSection("loginSection", loginButton);
-
-  notifyUser("Logged out successfully.");
-}
       });
+    }
+
+    function logoutUser() {
+      isLoggedIn = false;
+
+      document.body.classList.remove("logged-in");
+      document.body.classList.add("auth-mode");
+
+      document.getElementById("loginForm").reset();
+
+      setStatus("checking", "LOGIN REQUIRED");
+      document.getElementById("lastUpdated").textContent =
+        "Please login to continue. Dashboard will unlock after successful authentication.";
+
+      const loginButton = document.querySelector('[data-section="loginSection"]');
+      showSection("loginSection", loginButton);
+
+      notifyUser("Logged out successfully.");
     }
 
     bindForm("incidentForm", "addIncident", "Incident submitted successfully.");
